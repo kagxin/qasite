@@ -1,7 +1,12 @@
-package models
+package model
 
+import (
+	"github.com/jinzhu/gorm"
+)
+
+//User 用户表
 type User struct {
-	ID       int64  `json:"id"`       // 列名为 `id`
-	Username string `json:"username"` // 列名为 `username`
-	Password string `json:"password"` // 列名为 `password`
+	gorm.Model
+	Username string `json:"username" gorm:"unique_index;not null"` // 列名为 `username`
+	Password string `json:"password" gorm:"not null"`              // 列名为 `password`
 }
