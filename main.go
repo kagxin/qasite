@@ -13,7 +13,7 @@ import (
 
 func init() {
 	model.DB.SingularTable(true)
-	model.DB.AutoMigrate(&model.User{})
+	model.DB.AutoMigrate(&model.User{}, &model.Question{}, &model.Comment{})
 }
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Key:             middleware.KEY,
-		Timeout:         time.Hour,
+		Timeout:         time.Hour * 24 * 10,
 		MaxRefresh:      time.Hour,
 		IdentityKey:     middleware.IdentityKey,
 		PayloadFunc:     middleware.PayloadFunc,
@@ -45,7 +45,6 @@ func main() {
 	r.POST("/register", api.RegisterUser)
 
 	auth := r.Group("/")
-	// Refresh time can be longer than token timeout
 
 	auth.Use(authMiddleware.MiddlewareFunc())
 	{
