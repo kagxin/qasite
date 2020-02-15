@@ -19,7 +19,7 @@ func init() {
 func main() {
 
 	defer model.DB.Close()
-
+	model.DB.LogMode(true)
 	r := gin.Default()
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -50,6 +50,12 @@ func main() {
 	{
 		auth.GET("/refresh_token", authMiddleware.RefreshHandler)
 		auth.GET("/user", api.UserInfo)
+		auth.POST("/question", api.CreateQuestion)
+		auth.GET("/question/:QID", api.ShowQuestion)
+		auth.GET("/question", api.ShowQuestion)
+		auth.POST("/question/:QID/commit", api.CreateComment)
+		auth.GET("/question/:QID/commit", api.GetComment)
+
 	}
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
