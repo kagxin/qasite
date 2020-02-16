@@ -21,19 +21,19 @@ func RegisterUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&userVal); err == nil {
 		var user model.User
 		if model.DB.Where("username=?", userVal.Username).First(&user); user.Username == userVal.Username {
-			c.JSON(http.StatusOK, gin.H{"message": "existed"})
+			c.JSON(http.StatusOK, gin.H{"code": utils.HTTPUserExisted, "data": gin.H{}, "message": "existed"})
 			return
 		}
 
 		userD := model.User{Username: userVal.Username, Password: utils.Md5(userVal.Password)}
 		if DB := model.DB.Create(&userD); DB.Error != nil {
-			c.JSON(http.StatusOK, gin.H{"message": DB.Error.Error()})
+			c.JSON(http.StatusOK, gin.H{"message": DB.Error.Error(), "data": gin.H{}})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"message": "ok"})
+		c.JSON(http.StatusOK, gin.H{"message": "ok", "data": gin.H{}})
 
 	} else {
-		c.JSON(http.StatusOK, gin.H{"message": err.Error()})
+		c.JSON(http.StatusOK, gin.H{"message": err.Error(), "data": gin.H{}})
 	}
 
 }

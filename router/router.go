@@ -23,7 +23,6 @@ func Router() *gin.Engine {
 		auth.GET("/question", api.ShowQuestion)
 		auth.POST("/question/:QID/commit", api.CreateComment)
 		auth.GET("/question/:QID/commit", api.GetComment)
-
 	}
 	return r
 }

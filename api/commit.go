@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"qasite/middleware"
 	"qasite/model"
+	"qasite/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -25,9 +26,17 @@ func CreateComment(c *gin.Context) {
 			QuestionID: uint(qid),
 			UserID:     user.(*model.User).ID,
 		})
-		c.JSON(http.StatusOK, gin.H{"message": "ok"})
+		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPOK,
+			"message": "ok",
+			"data":    gin.H{},
+		})
 	} else {
-		c.JSON(http.StatusOK, err.Error())
+		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPParamError,
+			"message": err.Error(),
+			"data":    gin.H{},
+		})
 	}
 }
 
@@ -38,9 +47,22 @@ func GetComment(c *gin.Context) {
 		var comments []model.Comment
 		qid, _ := strconv.ParseUint(QID, 10, 64)
 		model.DB.Where("question_id=?", qid).Find(&comments)
+		var commentData []gin.H
+		for _, comment := range comments {
+			commentData = append(commentData, gin.H{
+				"id":          comment.ID,
+				"text":        comment.ID,
+				"question_id": comment.QuestionID,
+				"user_id":     comment.UserID,
+				"created_at":  comment.CreatedAt,
+				"updated_at":  comment.UpdatedAt,
+			})
+		}
+
 		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPOK,
 			"message": "ok",
-			"data":    comments,
+			"data":    commentData,
 		})
 
 	}

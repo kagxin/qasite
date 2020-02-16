@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"qasite/middleware"
 	"qasite/model"
+	"qasite/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,11 +28,15 @@ func CreateQuestion(c *gin.Context) {
 			UserID: user.(*model.User).ID,
 		})
 		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPOK,
 			"message": "create sucess",
+			"data":    gin.H{},
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPOK,
 			"message": err.Error(),
+			"data":    gin.H{},
 		})
 	}
 
@@ -56,9 +61,22 @@ func ShowQuestion(c *gin.Context) {
 	} else {
 		var qs []model.Question
 		model.DB.Find(&qs)
+		var questions []gin.H
+		for _, question := range qs {
+			questions = append(questions, gin.H{
+				"id":        question.ID,
+				"create_at": question.CreatedAt,
+				"update_at": question.UpdatedAt,
+				"title":     question.Title,
+				"text":      question.Text,
+				"user_id":   question.UserID,
+			})
+		}
+
 		c.JSON(http.StatusOK, gin.H{
+			"code":    utils.HTTPOK,
 			"message": "ok",
-			"data":    qs,
+			"data":    questions,
 		})
 
 	}

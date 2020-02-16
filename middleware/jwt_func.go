@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
 	"qasite/model"
 	"qasite/utils"
 	"reflect"
@@ -24,13 +25,11 @@ var KEY []byte = []byte("asdfjakldsfjlskjflkd")
 
 // UnauthorizedFunc asdfjsdasd
 func UnauthorizedFunc(c *gin.Context, code int, message string) {
-	c.JSON(code, gin.H{"code": code, "message": message})
+	c.JSON(code, gin.H{"code": code, "message": message, "data": gin.H{}})
 }
 
 // AuthorizatorFunc asdfasdf
 func AuthorizatorFunc(data interface{}, c *gin.Context) bool {
-	var a int = 10
-	fmt.Println(a)
 	return true
 }
 
@@ -70,6 +69,35 @@ func IdentityHandlerFunc(c *gin.Context) interface{} {
 	return &user
 }
 
+func LoginResponseFunc(c *gin.Context, code int, token string, expire time.Time) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    utils.HTTPOK,
+		"message": "ok",
+		"data": gin.H{
+			"token":  token,
+			"expire": expire.Format(time.RFC3339),
+		},
+	})
+}
+func RefreshResponseFunc(c *gin.Context, code int, token string, expire time.Time) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    utils.HTTPOK,
+		"message": "ok",
+		"data": gin.H{
+			"token":  token,
+			"expire": expire.Format(time.RFC3339),
+		},
+	})
+}
+
+func LogoutResponseFunc(c *gin.Context, code int) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    utils.HTTPOK,
+		"message": "ok",
+		"data":    gin.H{},
+	})
+}
+
 var AuthMiddleware *jwt.GinJWTMiddleware
 
 func init() {
@@ -86,6 +114,9 @@ func init() {
 		Authorizator:    AuthorizatorFunc,
 		Unauthorized:    UnauthorizedFunc,
 		TokenLookup:     "header: Authorization",
+		LoginResponse:   LoginResponseFunc,
+		RefreshResponse: RefreshResponseFunc,
+		LogoutResponse:  LogoutResponseFunc,
 
 		TimeFunc: time.Now,
 	})
