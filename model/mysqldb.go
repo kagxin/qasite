@@ -2,17 +2,21 @@ package model
 
 import (
 	"fmt"
+	"qasite/conf"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
 
-// DB * gorm.DB
 var DB *gorm.DB
 
 func init() {
 	var err error
-	DB, err = gorm.Open("mysql", "root:root@tcp(127.0.0.1:3306)/qasite?charset=utf8&parseTime=True&loc=Local")
+
+	sqlString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		conf.Mysql.Username, conf.Mysql.Password, conf.Mysql.Host, conf.Mysql.Port, conf.Mysql.Database)
+	fmt.Println(sqlString)
+	DB, err = gorm.Open("mysql", sqlString)
 
 	if err != nil {
 		fmt.Printf("mysql connect error %v", err)

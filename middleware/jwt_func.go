@@ -5,6 +5,7 @@ import (
 	"qasite/model"
 	"qasite/utils"
 	"reflect"
+	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -67,4 +68,29 @@ func IdentityHandlerFunc(c *gin.Context) interface{} {
 	username := claims[IdentityKey]
 	model.DB.Where("username=?", username).First(&user)
 	return &user
+}
+
+var AuthMiddleware *jwt.GinJWTMiddleware
+
+func init() {
+	// the jwt middleware
+	var err error
+	AuthMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
+		Key:             KEY,
+		Timeout:         time.Hour * 24 * 10,
+		MaxRefresh:      time.Hour,
+		IdentityKey:     IdentityKey,
+		PayloadFunc:     PayloadFunc,
+		IdentityHandler: IdentityHandlerFunc,
+		Authenticator:   AuthenticatorFunc,
+		Authorizator:    AuthorizatorFunc,
+		Unauthorized:    UnauthorizedFunc,
+		TokenLookup:     "header: Authorization",
+
+		TimeFunc: time.Now,
+	})
+
+	if err != nil {
+		panic("JWT Error:" + err.Error())
+	}
 }
