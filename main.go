@@ -16,6 +16,7 @@ func main() {
 	model.DB.LogMode(true)
 	r := router.Router()
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	//test revert
 }
 
 /*
@@ -25,5 +26,5 @@ TODO:
 3、gorm 多表查询
 4、不规则json解析
 5、gorm result row
-6、test git revert
+6、test
 */
