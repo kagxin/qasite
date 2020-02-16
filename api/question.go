@@ -1,11 +1,11 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"qasite/middleware"
 	"qasite/model"
 	"qasite/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,32 +44,49 @@ func CreateQuestion(c *gin.Context) {
 
 func ShowQuestion(c *gin.Context) {
 	qID, g := c.Params.Get("QID")
-	if g {
-		var q model.Question
-		result := model.DB.Where("id=?", qID).First(&q)
-		fmt.Println(result.RowsAffected)
+	var title, text, username string
+	var questionId, userId uint
+	var createdAt, updatedAt time.Time
 
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok",
-			"data": gin.H{
-				"title":   q.Title,
-				"text":    q.Text,
-				"id":      q.ID,
-				"user_id": q.UserID,
-			},
-		})
+	if g {
+		row := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username, q.created_at, q.updated_at from question q left join user on user.id=q.user_id where q.id=?", qID).Row()
+		if err := row.Scan(&title, &text, &questionId, &userId, &username, &createdAt, &updatedAt); err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "ok",
+				"data": gin.H{
+					"title":      title,
+					"text":       text,
+					"id":         questionId,
+					"user_id":    userId,
+					"username":   username,
+					"created_at": createdAt,
+					"updated_at": updatedAt,
+				},
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"code":    utils.HTTPNotFind,
+				"message": "not find question",
+				"data":    gin.H{},
+			})
+		}
+
 	} else {
 		var qs []model.Question
 		model.DB.Find(&qs)
+		rows, _ := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username " +
+			"from question q left join user on user.id=q.user_id").Rows()
 		var questions []gin.H
-		for _, question := range qs {
+		for rows.Next() {
+			rows.Scan(&title, &text, &questionId, &userId, &username)
 			questions = append(questions, gin.H{
-				"id":        question.ID,
-				"create_at": question.CreatedAt,
-				"update_at": question.UpdatedAt,
-				"title":     question.Title,
-				"text":      question.Text,
-				"user_id":   question.UserID,
+				"title":      title,
+				"text":       text,
+				"id":         questionId,
+				"user_id":    userId,
+				"username":   username,
+				"created_at": createdAt,
+				"updated_at": updatedAt,
 			})
 		}
 
