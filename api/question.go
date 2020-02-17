@@ -5,6 +5,7 @@ import (
 	"qasite/middleware"
 	"qasite/model"
 	"qasite/utils"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -46,10 +47,11 @@ func ShowQuestion(c *gin.Context) {
 	qID, g := c.Params.Get("QID")
 	var title, text, username string
 	var questionId, userId uint
-	var createdAt, updatedAt time.Time
+	var updatedAt, createdAt time.Time
 
 	if g {
-		row := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username, q.created_at, q.updated_at from question q left join user on user.id=q.user_id where q.id=?", qID).Row()
+		qIDUint, _ := strconv.ParseUint(qID, 10, 64)
+		row := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username, q.created_at, q.updated_at from question q left join user on user.id=q.user_id where q.id=?", qIDUint).Row()
 		if err := row.Scan(&title, &text, &questionId, &userId, &username, &createdAt, &updatedAt); err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "ok",
@@ -74,11 +76,10 @@ func ShowQuestion(c *gin.Context) {
 	} else {
 		var qs []model.Question
 		model.DB.Find(&qs)
-		rows, _ := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username " +
-			"from question q left join user on user.id=q.user_id").Rows()
+		rows, _ := model.DB.Raw("select q.title, q.text, q.id, q.user_id, user.username, q.created_at, q.updated_at from question q left join user on user.id=q.user_id").Rows()
 		var questions []gin.H
 		for rows.Next() {
-			rows.Scan(&title, &text, &questionId, &userId, &username)
+			rows.Scan(&title, &text, &questionId, &userId, &username, &createdAt, &updatedAt)
 			questions = append(questions, gin.H{
 				"title":      title,
 				"text":       text,
