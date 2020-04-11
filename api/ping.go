@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) ping(c *gin.Context) {
-	response.JSON(c, errno.Success, gin.H{"hello": "world"})
+func (s *Service) Ping(c *gin.Context) {
+	response.JSON(c, errno.Success, gin.H{"message": "pong"})
 	return
 }

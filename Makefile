@@ -1,7 +1,4 @@
 all:
-	go build -o qasite.exe .
-	./qasite.exe
-install:
-	go mod download
+	go build -o qasite cmd/main.go
 clean:
-	rm qasite.exe
+	rm qasite

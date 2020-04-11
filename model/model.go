@@ -21,7 +21,7 @@ type User struct {
 type Token struct {
 	gorm.Model
 	UserID    uint      `gorm:"column:user_id"`
-	Token     string    `gorm:"column:text; type:text;not null;"`
+	Token     string    `gorm:"column:token; type:text;not null;"`
 	ExpiresIn time.Time `gorm:"index; not null"`
 }
 

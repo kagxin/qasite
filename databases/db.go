@@ -2,17 +2,14 @@ package databases
 
 import (
 	"fmt"
+	"log"
 	"qasite/conf"
 
 	"github.com/jinzhu/gorm"
-	"github.com/prometheus/common/log"
 )
 
-// DB asdf
-type DB gorm.DB
-
 // InitMysql 初始化gorm db
-func InitMysql(mysql *conf.MysqlConfig) *DB {
+func InitMysql(mysql *conf.MysqlConfig) *gorm.DB {
 
 	var err error
 	var db *gorm.DB
@@ -25,5 +22,6 @@ func InitMysql(mysql *conf.MysqlConfig) *DB {
 	if err != nil {
 		log.Fatal("mysql connect error %v", err)
 	}
-	return (*DB)(db)
+
+	return db
 }
