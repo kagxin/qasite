@@ -17,6 +17,9 @@
 * `GET` /question
 获取问题列表
 
+* `GET` /question/{:id}
+问题详情
+
 * `POST` /question/{:id}/comment
 添加评论
 
