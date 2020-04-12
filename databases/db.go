@@ -20,7 +20,7 @@ func InitMysql(mysql *conf.MysqlConfig) *gorm.DB {
 	db, err = gorm.Open("mysql", sqlString)
 
 	if err != nil {
-		log.Fatal("mysql connect error %v", err)
+		log.Fatalf("mysql connect error %v", err)
 	}
 
 	return db
