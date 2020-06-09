@@ -8,8 +8,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type DB struct {
+	DB *gorm.DB
+}
+
 // InitMysql 初始化gorm db
-func InitMysql(mysql *conf.MysqlConfig) *gorm.DB {
+func New(mysql *conf.MysqlConfig) *DB {
 
 	var err error
 	var db *gorm.DB
@@ -23,5 +27,5 @@ func InitMysql(mysql *conf.MysqlConfig) *gorm.DB {
 		log.Fatalf("mysql connect error %v", err)
 	}
 
-	return db
+	return &DB{DB: db}
 }

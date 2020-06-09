@@ -1,12 +1,13 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/common/log"
 	"qasite/errno"
 	"qasite/model"
 	"qasite/utils"
 	"qasite/utils/response"
+
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/common/log"
 )
 
 func (s *Service) Register(c *gin.Context) {
@@ -17,13 +18,13 @@ func (s *Service) Register(c *gin.Context) {
 		return
 	}
 	user := model.User{}
-	if !s.DB.Where("username=?", regUser.Username).First(&user).RecordNotFound() {
+	if !s.Mysql.DB.Where("username=?", regUser.Username).First(&user).RecordNotFound() {
 		response.JSON(c, errno.UsernameExisted, nil)
 		return
 	}
 	pwd := utils.Md5(regUser.Password)
 
-	if err := s.DB.Where(model.User{Username: regUser.Username}).Assign(model.User{Password: pwd}).FirstOrCreate(&user).Error; err != nil {
+	if err := s.Mysql.DB.Where(model.User{Username: regUser.Username}).Assign(model.User{Password: pwd}).FirstOrCreate(&user).Error; err != nil {
 		response.JSON(c, errno.ServerError, nil)
 		return
 	}

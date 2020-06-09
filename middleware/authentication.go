@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"qasite/api"
 	"qasite/errno"
 	"qasite/model"
 	"qasite/utils/response"
+
+	"github.com/gin-gonic/gin"
 )
 
 func BasicTokenAuth(service *api.Service) gin.HandlerFunc {
@@ -18,12 +19,12 @@ func BasicTokenAuth(service *api.Service) gin.HandlerFunc {
 			return
 		}
 		token := model.Token{}
-		if err := service.DB.Where("token=?", tokenStr).First(&token).Error; err != nil {
+		if err := service.Mysql.DB.Where("token=?", tokenStr).First(&token).Error; err != nil {
 			response.JSON(c, errno.TokenNotFound, gin.H{})
 			return
 		}
 		user := model.User{}
-		if err := service.DB.Where("id=?", token.UserID).First(&user).Error; err != nil {
+		if err := service.Mysql.DB.Where("id=?", token.UserID).First(&user).Error; err != nil {
 			response.JSON(c, errno.TokenNotFound, gin.H{})
 			return
 		}

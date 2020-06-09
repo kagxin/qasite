@@ -1,10 +1,11 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
 	"qasite/errno"
 	"qasite/model"
 	"qasite/utils/response"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Service) CreateQuestion(c *gin.Context) {
@@ -19,7 +20,7 @@ func (s *Service) CreateQuestion(c *gin.Context) {
 		Text:   q.Text,
 		UserID: user.ID,
 	}
-	s.DB.Create(&question)
+	s.Mysql.DB.Create(&question)
 	response.JSON(c, errno.Success, question)
 }
 
@@ -32,10 +33,10 @@ func (s *Service) Question(c *gin.Context) {
 	var count int
 	done := make(chan bool, 1)
 	go func() {
-		s.DB.Model(model.Question{}).Count(&count)
+		s.Mysql.DB.Model(model.Question{}).Count(&count)
 		done <- true
 	}()
-	s.DB.Offset(qq.PageSize * (qq.Page - 1)).Limit(qq.PageSize).Find(&questions)
+	s.Mysql.DB.Offset(qq.PageSize * (qq.Page - 1)).Limit(qq.PageSize).Find(&questions)
 	<-done
 
 	response.JSON(c, errno.Success, model.Paginator{
@@ -49,7 +50,7 @@ func (s *Service) Question(c *gin.Context) {
 func (s *Service) QuestionDetail(c *gin.Context) {
 	questionId := c.Param("QID")
 	var question model.Question
-	if s.DB.Where("id=?", questionId).First(&question).RecordNotFound() {
+	if s.Mysql.DB.Where("id=?", questionId).First(&question).RecordNotFound() {
 		response.JSON(c, errno.NotFound, nil)
 		return
 	}

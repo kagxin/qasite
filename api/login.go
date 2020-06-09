@@ -1,12 +1,13 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
 	"qasite/errno"
 	"qasite/model"
 	"qasite/utils"
 	"qasite/utils/response"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Service) Login(c *gin.Context) {
@@ -16,7 +17,7 @@ func (s *Service) Login(c *gin.Context) {
 		return
 	}
 	user := model.User{}
-	if err := s.DB.Where("username=?", loginReq.Username).First(&user).Error; err != nil {
+	if err := s.Mysql.DB.Where("username=?", loginReq.Username).First(&user).Error; err != nil {
 		response.JSON(c, errno.UsernameNotFound, nil)
 		return
 	}
@@ -27,7 +28,7 @@ func (s *Service) Login(c *gin.Context) {
 	tokenStr := utils.GenToken(user.ID)
 	expiresIn := time.Now().Add(time.Hour * 24 * 7)
 	token := model.Token{}
-	s.DB.Where(model.Token{UserID: user.ID}).
+	s.Mysql.DB.Where(model.Token{UserID: user.ID}).
 		Assign(model.Token{Token: tokenStr, ExpiresIn: expiresIn}).
 		FirstOrCreate(&token)
 	response.JSON(c, errno.Success, token)

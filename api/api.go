@@ -1,17 +1,18 @@
 package api
 
 import (
-	"github.com/jinzhu/gorm"
 	"qasite/conf"
+	"qasite/databases"
 )
 
 // Service 接口的handle
 type Service struct {
-	Conf *conf.Config
-	DB   *gorm.DB
+	Conf  *conf.Config
+	Mysql *databases.DB
 }
 
 // Init Service
-func Init(conf *conf.Config, db *gorm.DB) *Service {
-	return &Service{conf, db}
+func New(conf *conf.Config) *Service {
+
+	return &Service{Conf: conf, Mysql: databases.New(conf.Mysql)}
 }
